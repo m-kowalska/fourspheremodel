@@ -33,7 +33,7 @@ ana_list = [ana_rad, ana_tan, ana_mix]
 
 fem_list = [ii.reshape(180, 180) for ii in fem_list]
 ana_list = [ii.reshape(180, 180) for ii in ana_list]
-error_list = [np.abs(ii - jj) for ii, jj in zip(fem_list, ana_list)]
+error_list = [100.*np.abs((ii - jj)/np.max(jj)) for ii, jj in zip(fem_list, ana_list)] 
 error_max = [np.max(ii) for ii in error_list]
 
 abs_max_val = [np.max(np.abs(ii)) for ii in ana_list]
@@ -108,8 +108,9 @@ def adjust_3d_axis(ax, ii):
 z_steps = 4
 height_ratios = [1 for i in range(z_steps - 1)]
 height_ratios.append(0.07)  # height of colorbar
-fig = plt.figure(figsize=(10,10))
-gs = gridspec.GridSpec(z_steps, 3, height_ratios=height_ratios, wspace=0.3, hspace=0.4)
+fig = plt.figure(figsize=(12, 10))
+#gs = gridspec.GridSpec(z_steps, 3, height_ratios=height_ratios, wspace=0.3, hspace=0.4)
+gs = gridspec.GridSpec(z_steps, 4, height_ratios=height_ratios, wspace=0.3, hspace=0.4)
 
 # for ii, P1, letter in zip([0, 1, 2], P1s, ['A', 'E', 'I']):
 #     ax = plt.subplot(gs[ii, 0])
@@ -139,9 +140,10 @@ rstride = 1
 cstride = 1
 
 #title_texts = ['Analytical', 'FEM', 'Error']
-title_texts = ['Analytical', 'Analytical', 'abs(Analytical-FEM)']
+title_texts = ['', 'Analytical', 'FEM', '% error']
 row_texts = ['Radial ', 'Tangential', 'Mixed']
-sphere_xlabel = [r'$\alpha = 0^\circ$', r'$\alpha = 90^\circ$', r'$\alpha = 45^\circ$']
+#sphere_xlabel = [r'$\alpha = 0^\circ$', r'$\alpha = 90^\circ$', r'$\alpha = 45^\circ$']
+sphere_xlabel = [r'', r'', r'']
 
 def plot_phi_sphere(idx_val, letters, phi, error=None):
     for ii, letter in zip([0, 1, 2], letters):
@@ -177,7 +179,7 @@ def plot_phi(idx_val, letters, phi, error=None):
         
 
         else:
-            vmax = 0.002
+            vmax = 0.5
             vmin = 0.0
             cmap = cm.Greys
             #clrs = plt.cm.Greys((phi[ii] - vmin) / (vmax - vmin))
@@ -193,14 +195,16 @@ def plot_phi(idx_val, letters, phi, error=None):
         if error is None:
             CS = plt.contour(90.+params.phi_angle.reshape(180, 180),
                              params.theta.reshape(180, 180),
-                             phi[ii], colors='k')
-            plt.clabel(CS, fontsize=6, inline=1)
+                             phi[ii], colors='k' , linewidths=0.25)
+            plt.clabel(CS, fontsize=5, inline=1)
 
-        ax.set_xlabel(r'$ \phi $' + ' (degrees)')
-        ax.set_ylabel(r'$ \theta $' + ' (degrees)')
+        if ii == 2:
+            ax.set_xlabel(r'$ \phi $' + ' (degrees)')
+        if idx_val == 1:
+            ax.set_ylabel(r'$ \theta $' + ' (degrees)')
 
         if ii == 0:
-            ax.set_title(title_texts[title_idx], y=1.1)
+            ax.set_title(title_texts[idx_val], y=1.1)
 
         plt.xticks(np.arange(0, 180, 30), np.arange(-90, 90, 30))
         plt.yticks(np.arange(0, 180, 30), np.arange(0, 180, 30)) 
@@ -210,16 +214,17 @@ def plot_phi(idx_val, letters, phi, error=None):
 
 
 
-plot_phi_sphere(0, ['B', 'F', 'J'], ana_list)
-im_phi = plot_phi(1, ['C', 'G', 'K'], ana_list)
-cax_phi = plt.subplot(gs[3, 0:2])
+plot_phi_sphere(0, ['A', 'E', 'I'], ana_list)
+im_phi = plot_phi(1, ['B', 'F', 'J'], ana_list)
+im_phi_2 = plot_phi(2, ['C', 'G', 'K'], fem_list)
+cax_phi = plt.subplot(gs[3, 0:3])
 plt.colorbar(im_phi, cax=cax_phi, extend='both', orientation='horizontal')
 
-im_error = plot_phi(2, ['D', 'H', 'L'], error_list, error=True)
-cax_error = plt.subplot(gs[3, 2])
+im_error = plot_phi(3, ['D', 'H', 'L'], error_list, error=True)
+cax_error = plt.subplot(gs[3, 3])
 cbar = plt.colorbar(im_error, cax=cax_error, orientation='horizontal',
-                    ticks=[0.0, 0.001, 0.002])
-cbar.ax.set_xticklabels(['0.0', '0.001', '0.002'])
+                    ticks=[0.0, 0.25, 0.5], extend='max')
+cbar.ax.set_xticklabels(['0.0', '0.25', '0.5'])
 
-plt.savefig('figure2_alt.png')
+plt.savefig('figure2_alt.png', dpi=300)
 #plt.show()
