@@ -20,13 +20,14 @@ for dipole in dipole_list:
     P1s.append(np.array((src * I, -1 * snk * I)))
     name_list.append(dipole["name"])
 
-ana_rad = np.load(os.path.join("results", "Analytical_rad.npz"))['phi_20']
-ana_tan = np.load(os.path.join("results", "Analytical_tan.npz"))['phi_20']
-ana_mix = np.load(os.path.join("results", "Analytical_mix.npz"))['phi_20']
+scaling_k = 100.
+ana_rad = np.load(os.path.join("results", "Analytical_rad.npz"))['phi_20']*scaling_k
+ana_tan = np.load(os.path.join("results", "Analytical_tan.npz"))['phi_20']*scaling_k
+ana_mix = np.load(os.path.join("results", "Analytical_mix.npz"))['phi_20']*scaling_k
 
-num_rad = np.load(os.path.join("results", "Numerical_rad.npz"))['fem_20']
-num_tan = np.load(os.path.join("results", "Numerical_tan.npz"))['fem_20']
-num_mix = np.load(os.path.join("results", "Numerical_mix.npz"))['fem_20']
+num_rad = np.load(os.path.join("results", "Numerical_rad.npz"))['fem_20']*scaling_k
+num_tan = np.load(os.path.join("results", "Numerical_tan.npz"))['fem_20']*scaling_k
+num_mix = np.load(os.path.join("results", "Numerical_mix.npz"))['fem_20']*scaling_k
 
 fem_list = [num_rad, num_tan, num_mix]
 ana_list = [ana_rad, ana_tan, ana_mix]
@@ -149,11 +150,11 @@ def plot_phi_sphere(idx_val, letters, phi, error=None):
     for ii, letter in zip([0, 1, 2], letters):
         ax = plt.subplot(gs[ii, idx_val], projection='3d')
         if error is None:
-            vmax = 0.2  # abs_max_range[ii]
+            vmax = 10.  # abs_max_range[ii]
             vmin = -1 * vmax
             clrs = plt.cm.PRGn((phi[ii] - vmin) / (vmax - vmin))
         else:
-            vmax = 0.002
+            vmax = 0.3
             vmin = 0.0
             clrs = plt.cm.Greys((phi[ii] - vmin) / (vmax - vmin))
         ax.plot_surface(X, Y, Z,
@@ -171,7 +172,7 @@ def plot_phi(idx_val, letters, phi, error=None):
     for ii, letter in zip([0, 1, 2], letters):
         ax = plt.subplot(gs[ii, idx_val])
         if error is None:
-            vmax = 0.2  # abs_max_range[ii]
+            vmax = 10.  # abs_max_range[ii]
             vmin = -1 * vmax
             #clrs = plt.cm.PRGn((phi[ii] - vmin) / (vmax - vmin))
             cmap = cm.PRGn
@@ -179,7 +180,7 @@ def plot_phi(idx_val, letters, phi, error=None):
         
 
         else:
-            vmax = 0.5
+            vmax = 0.3
             vmin = 0.0
             cmap = cm.Greys
             #clrs = plt.cm.Greys((phi[ii] - vmin) / (vmax - vmin))
@@ -218,13 +219,15 @@ plot_phi_sphere(0, ['A', 'E', 'I'], ana_list)
 im_phi = plot_phi(1, ['B', 'F', 'J'], ana_list)
 im_phi_2 = plot_phi(2, ['C', 'G', 'K'], fem_list)
 cax_phi = plt.subplot(gs[3, 0:3])
-plt.colorbar(im_phi, cax=cax_phi, extend='both', orientation='horizontal')
+cbar_0 = plt.colorbar(im_phi, cax=cax_phi, extend='both', orientation='horizontal')
+cbar_0.set_label(r'Potential ($\mathrm{\mu}$V)')
 
 im_error = plot_phi(3, ['D', 'H', 'L'], error_list, error=True)
 cax_error = plt.subplot(gs[3, 3])
 cbar = plt.colorbar(im_error, cax=cax_error, orientation='horizontal',
-                    ticks=[0.0, 0.25, 0.5], extend='max')
-cbar.ax.set_xticklabels(['0.0', '0.25', '0.5'])
+                    ticks=[0.0, 0.1, 0.2, 0.3], extend='max')
+cbar.ax.set_xticklabels(['0.0', '0.1', '0.2', '0.3'])
+cbar.set_label(r'%')
 
-plt.savefig('figure2_alt.png', dpi=300)
+plt.savefig('figure2_alt.jpeg', dpi=500)
 #plt.show()
