@@ -30,12 +30,23 @@ ana_list = [ana_rad, ana_tan, ana_mix]
 fem_list = [ii.reshape(180, 180) for ii in fem_list]
 ana_list = [ii.reshape(180, 180) for ii in ana_list]
 error_list = [np.abs(ii - jj) for ii, jj in zip(fem_list, ana_list)]
-error_max = [np.max(ii) for ii in error_list]
 
-abs_max_val = [np.max(np.abs(ii)) for ii in ana_list]
-abs_max_range = [0.3 * ii for ii in abs_max_val]
-print 'Error max for rad, tan, mix: ', error_max
-print 'Abs max for rad, tan, min', [np.max(np.abs(ii)) for ii in ana_list]
+# RE_list = [np.abs(ii)/np.abs(jj) for ii, jj in zip(error_list, ana_list)]
+# A = np.array(RE_list).flatten()
+# for idx, i in enumerate(A):
+#     if i > 1.:
+#         A[idx] = 1.
+# RE_list = A.reshape(3,180,180)
+
+# abs_max_val = [np.max(np.abs(ii)) for ii in ana_list]
+# abs_max_range = [0.3 * ii for ii in abs_max_val]
+mean_abs_eeg = np.average(np.abs([ana_tan, ana_rad, ana_mix])) # average normalization
+max_abs_eeg = np.max(np.abs([ana_tan, ana_rad, ana_mix])) # max normalization
+# scaled_error_list0 = [error_list[i]/mean_abs_eeg for i in range(3)]  # average normalization
+scaled_error_list = [error_list[i]/max_abs_eeg for i in range(3)] # max normalization
+# scaled_error_list = [error_list[i]/max_1promille for i in range(3)]
+# print 'Error max for rad, tan, mix: ', error_max
+# print 'Abs max for rad, tan, min', [np.max(np.abs(ii)) for ii in ana_list]
 
 
 I = 1.0*k
@@ -69,7 +80,7 @@ subdomain_markers = []
 for pos in elec_pos:
     rad = np.sqrt(pos[0]**2 + pos[1]**2 + pos[2]**2)
     # print r
-    if rad < Radii[0]:  #  or (r-79000.) < 1e-16:
+    if rad < Radii[0]-500:  #  or (r-79000.) < 1e-16:
         subdomain_markers.append(0.1)
     elif rad < Radii[1]: #  or (r-80000.) < 1e-16:
         subdomain_markers.append(0.2)
@@ -87,13 +98,18 @@ print 'creating color lists'
 vmax = 10
 vmin = -vmax
 clr = lambda phi: plt.cm.PRGn((phi - vmin) / (vmax - vmin))
-vmax_error = .4
+vmax_error = .03
+vmax_error_glob_max = 0.003
 vmin_error = 0.
-clr_error = lambda error: plt.cm.Greys((error - vmin_error) / (vmax_error - vmin_error))
+# clr_error = lambda error: plt.cm.Greys((error - vmin_error) / (vmax_error - vmin_error))
+clr_error = lambda error: plt.cm.Greys((error - vmin_error) / (vmax_error_glob_max - vmin_error))
 
 colors_4s_list = [clr(ana_list[idx]) for idx in range(3)]
 colors_fem_list = [clr(fem_list[idx]) for idx in range(3)]
-colors_error_list = [clr_error(error_list[idx]) for idx in range(3)]
+# colors_error_list = [clr_error(error_list[idx]) for idx in range(3)]
+colors_scaled_error_list = [clr_error(scaled_error_list[idx]) for idx in range(3)]
+# print 'max_RE', np.max(RE_list)
+# colors_RE_list = [clr_RE(RE_list[idx]) for idx in range(3)]
 print 'colors_4s created, ready for plotting'
 
 #############################################################################
@@ -116,16 +132,17 @@ ax11 = plt.subplot2grid((3,4),(2,2), projection='3d')
 ax12 = plt.subplot2grid((3,4),(2,3), projection='3d')
 ax2.set_title('Analytical', y = 1.1)
 ax3.set_title('FEM', y = 1.1)
-ax4.set_title('Difference', y = 1.1)
+# ax4.set_title('Relative error', y = 1.1)
+ax4.set_title('Error scaled', y = 1.1)
 
 # plot geometry
-print 'plotting geometry'
+# print 'plotting geometry'
 for ax, P1 in zip([ax1, ax5, ax9], P1s):
     im = ax.imshow(subd_markers.reshape(len(ys), len(zs)).T,
                     origin='lower', interpolation='nearest', extent = [-90000., 90000., -90000., 90000.])
-    cmap = colors.ListedColormap([ '#999999', '#83caff', '#e6e6e6', '#ffcc99'])
+    cmap = colors.ListedColormap(['#ffffff', '#83caff', '#999999', '#ffcc99'])
     im.set_cmap(cmap)
-    ax.add_patch(plt.Circle((0, 0), radius = Radii[0], color = 'gray', fill=False, lw = .3))
+    ax.add_patch(plt.Circle((0, 0), radius = Radii[0]-500, color = 'gray', fill=False, lw = .3))
     ax.add_patch(plt.Circle((0, 0), radius = Radii[1], color = 'gray', fill=False, lw = .3))
     ax.add_patch(plt.Circle((0, 0), radius = Radii[2], color = 'gray', fill=False, lw = .3))
     ax.add_patch(plt.Circle((0,0), radius = Radii[3], color = 'gray', fill=False, lw = .5))
@@ -140,7 +157,7 @@ for ax, P1 in zip([ax1, ax5, ax9], P1s):
 
     rz = rz1*1e4
     arrow = np.sum(P1, axis = 0)*1800
-    start_pos = rz - arrow
+    start_pos = rz -np.array([0,0,500])- arrow
     print'start-pos',  start_pos
     print 'arrow', arrow
     print 'P1', P1
@@ -170,7 +187,9 @@ for ax, clrs in zip([ax3, ax7, ax11], colors_fem_list):
                              linewidth=0, antialiased=False)
 print 'surf2 OK'
 # plot errors
-for ax, clrs in zip([ax4, ax8, ax12], colors_error_list):
+# for ax, clrs in zip([ax4, ax8, ax12], colors_error_list):
+for ax, clrs in zip([ax4, ax8, ax12], colors_scaled_error_list):
+# for ax, clrs in zip([ax4, ax8, ax12], colors_RE_list):
     surf3 = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, facecolors = clrs,#cmap=plt.cm.Blues,
                    linewidth=0, antialiased=False)  #, norm=colors.LogNorm(vmin=1e-7, vmax=1e-2))
 print 'surf3 OK'
@@ -185,48 +204,32 @@ for ax in [ax2, ax3, ax4, ax6, ax7, ax8, ax10, ax11, ax12]:
 print 'axes ok'
 
 
-# plt.show()
-
-# plt.savefig('./results/eeg_fig_scaled.pdf', dpi=600., bbox_inches='tight')
-
-
 # colorbars
 cax1 = fig.add_axes([0.31, 0.07, 0.38, 0.01])
 m = plt.cm.ScalarMappable(cmap=plt.cm.PRGn)
 
-# ticks = np.linspace(-100, 100, 9)
+ticks = np.linspace(-vmax,vmax, 9)
 
-m.set_array(ana_list[1])
-# m.set_array(ticks)
+m.set_array(ticks)
 cbar1 = fig.colorbar(m, cax=cax1, format='%3.3f', extend = 'both', orientation='horizontal')
 cbar1.outline.set_visible(False)
-ticks = np.linspace(-32, 32, 9)
-cax1.set_xticklabels(ticks, rotation=40.)
 
-# ticks = np.linspace(-80, 50, 9)
-# cbar1.locator = ticker.FixedLocator(ticks)
-# cbar1.formatter = ticker.FixedFormatter([str(i) for i in ticks])
-# cbar1.update_ticks()
-
-# cbar1.set_ticks(ticks)
-# cax1.set_xticklabels([str(i) for i in ticks], rotation=40.)
+cbar1.set_ticks(ticks)
+cax1.set_xticklabels([str(i) for i in ticks], rotation=40.)
 cbar1.set_label(r'Potential ($\mathrm{\mu}$V)', labelpad=1.)
 
 cax2 = fig.add_axes([0.79, 0.07, 0.15, 0.01])
 m = plt.cm.ScalarMappable(cmap=plt.cm.Greys)
-ticks2 = np.linspace(0.05, 0.25, 5)
-# m.set_array(ticks2)
-m.set_array(error_list[0])
+ticks2 = np.linspace(vmin_error, vmax_error_glob_max, 4) # global normalization
+
+m.set_array(ticks2)
 cbar2 = fig.colorbar(m, cax=cax2, format='%3.6f', extend='max', orientation='horizontal')
 cbar2.outline.set_visible(False)
-cax2.set_xticklabels(['0.03', '', '0.09', '', '0.15', '', '0.21', '', '0.27'], rotation=40.)
-# cbar2.set_ticks(ticks2)
-# cax2.set_xticklabels([str(i) for i in ticks2], rotation=40.)
-# cax2.set_xticks(ticks2)
-# cax2.set_xticklabels(['0.001', '', '0.002', '', '0.003', '', '0.004', '', '0.005'], rotation = 40)
 
-# multiply both P and phi's with 1000 and we get the same result, but in mV
-cbar2.set_label(r'Potential ($\mathrm{\mu}$V)', labelpad=4.1)
+cbar2.set_ticks(ticks2)
+cax2.set_xticklabels([str(i*100) for i in ticks2], rotation=40.)
+
+cbar2.set_label(r'%', labelpad=9.1)
 
 fig.subplots_adjust(wspace = -.1, hspace=-.1, right = 0.98, left = 0.01)
 
@@ -297,4 +300,6 @@ fig.set_size_inches(6.5, 6.)
 # plt.show()
 print 'saving figure'
 # fig.tight_layout()
-plt.savefig('./results/eeg_fig_scaled3.png', dpi=600., bbox_inches='tight')
+# plt.savefig('./results/figure2_w_scaled_glob_avg_strength_error.png', dpi=300., bbox_inches='tight')
+plt.savefig('./results/figure2_w_scaled_glob_max5.png', dpi=600., bbox_inches='tight')
+# plt.savefig('./results/figure2_w_RE.png', dpi=300., bbox_inches='tight')
