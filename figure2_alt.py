@@ -39,8 +39,8 @@ error_max = [np.max(ii) for ii in error_list]
 
 abs_max_val = [np.max(np.abs(ii)) for ii in ana_list]
 abs_max_range = [0.3 * ii for ii in abs_max_val]
-print 'Error max for rad, tan, mix: ', error_max
-print 'Abs max for rad, tan, min', [np.max(np.abs(ii)) for ii in ana_list]
+print('Error max for rad, tan, mix: ', error_max)
+print('Abs max for rad, tan, min', [np.max(np.abs(ii)) for ii in ana_list])
 
 
 def set_axis(ax, letter):

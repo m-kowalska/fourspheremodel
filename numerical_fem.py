@@ -21,8 +21,8 @@ def main_4shell_fem(mesh, subdomains, boundaries, skull_cond, src_pos, snk_pos):
     u = TrialFunction(V)
 
     phi = Function(V)
-    dx = Measure("dx")[subdomains]
-    ds = Measure("ds")[boundaries]
+    dx = Measure("dx")(subdomain_data=subdomains)
+    ds = Measure("ds")(subdomain_data=boundaries)
     a = inner(sigma_B * grad(u), grad(v))*dx(params.whitemattervol) + \
         inner(sigma_B * grad(u), grad(v))*dx(params.graymattervol) + \
         inner(sigma_Sc * grad(u), grad(v))*dx(params.scalpvol) + \
@@ -48,7 +48,7 @@ def main_4shell_fem(mesh, subdomains, boundaries, skull_cond, src_pos, snk_pos):
     solver.parameters["monitor_convergence"] = True
 
     info(solver.parameters, True)
-    set_log_level(PROGRESS)
+#    set_log_level(PROGRESS) does not work in fenics 2018.1.0
     solver.solve(A, phi.vector(), b)
 
     ele_pos_list = params.ele_coords
@@ -57,25 +57,25 @@ def main_4shell_fem(mesh, subdomains, boundaries, skull_cond, src_pos, snk_pos):
     return vals
 
 if __name__ == '__main__':
-    print 'Loading meshes'
+    print('Loading meshes')
     mesh = Mesh(os.path.join("mesh", "sphere_4.xml"))
     subdomains = MeshFunction("size_t", mesh, os.path.join("mesh", "sphere_4_physical_region.xml"))
     boundaries = MeshFunction("size_t", mesh, os.path.join("mesh", "sphere_4_facet_region.xml"))
     for dipole in params.dipole_list:
-        print 'Now computing FEM for dipole: ', dipole['name']
+        print('Now computing FEM for dipole: ', dipole['name'])
         src_pos = dipole['src_pos']
         snk_pos = dipole['snk_pos']
-        print 'Done loading meshes'
+        print('Done loading meshes')
         fem_20 = main_4shell_fem(mesh, subdomains, boundaries,
                                  params.sigma_skull20, src_pos, snk_pos)
-        print 'Done 4Shell-FEM-20'
+        print('Done 4Shell-FEM-20')
         fem_40 = main_4shell_fem(mesh, subdomains, boundaries,
                                  params.sigma_skull40, src_pos, snk_pos)
-        print 'Done 4Shell-FEM-40'
+        print('Done 4Shell-FEM-40')
         fem_80 = main_4shell_fem(mesh, subdomains, boundaries,
                                  params.sigma_skull80, src_pos, snk_pos)
-        print 'Done 4Shell-FEM-80'
+        print('Done 4Shell-FEM-80')
         f = open(os.path.join('results',
-                              'Numerical_' + dipole['name'] + '.npz'), 'w')
+                              'Numerical_' + dipole['name'] + '.npz'), 'wb')
         np.savez(f, fem_20=fem_20, fem_40=fem_40, fem_80=fem_80)
         f.close()

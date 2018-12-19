@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 from plotting_convention import mark_subplots, simplify_axes
 import parameters as params
 import sys
-reload(sys)
-sys.setdefaultencoding('UTF-8')
+#from importlib import reload
+#reload(sys)
+#sys.setdefaultencoding('UTF-8')
 
 # Homogeneous sphere, Nunez 2006, Eq. 6.7
 k = 100 #to get answer in 10-100 µV

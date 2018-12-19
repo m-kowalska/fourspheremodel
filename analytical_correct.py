@@ -77,7 +77,7 @@ def H(n, r_ele=params.scalp_rad):
         T1 = ((r_ele / params.scalp_rad)**n) * A4(n)
         T2 = ((params.scalp_rad / r_ele)**(n + 1)) * B4(n)
     else:
-        print "Invalid electrode position"
+        print("Invalid electrode position")
         return
     return (T1 + T2)
 
@@ -175,7 +175,7 @@ I = 1.
 n = np.arange(1, 100)
 
 for dipole in params.dipole_list:
-    print 'Now computing for dipole: ', dipole['name']
+    print('Now computing for dipole: ', dipole['name'])
     src_pos = dipole['src_pos']
     snk_pos = dipole['snk_pos']
 
@@ -192,7 +192,7 @@ for dipole in params.dipole_list:
     phi_lim = compute_phi(s12, s23, s34, I)
 
     f = open(os.path.join('results',
-                          'Analytical_' + dipole['name'] + '.npz'), 'w')
+                          'Analytical_' + dipole['name'] + '.npz'), 'wb')
     np.savez(f, phi_20=phi_20, phi_40=phi_40, phi_80=phi_80, phi_lim=phi_lim)
     f.close()
 

@@ -77,7 +77,7 @@ def H(n, r_ele=params.scalp_rad):
         T1 = ((r_ele / params.scalp_rad)**n) * A4(n)
         T2 = ((params.scalp_rad / r_ele)**(n + 1)) * B4(n)
     else:
-        print "Invalid electrode position"
+        print("Invalid electrode position")
         return
     return (T1 + T2)
 
@@ -172,12 +172,12 @@ n = np.arange(1, 100)
 
 dipole = params.dipole_list[0]  # 'rad_dipole'
 
-print 'WARNING: These results are for comparision only!'
-print 'Please use the correct formulation instead'
-print 'Now computing for dipole using Nunez&Srinivasan06: ', dipole['name']
+print('WARNING: These results are for comparision only!')
+print('Please use the correct formulation instead')
+print('Now computing for dipole using Nunez&Srinivasan06: ', dipole['name'])
 src_pos = dipole['src_pos']
 snk_pos = dipole['snk_pos']
-print 'Not evaluating the tangential component'
+print('Not evaluating the tangential component')
 
 s12, s23, s34 = conductivity(params.sigma_skull20)
 phi_20 = compute_phi(s12, s23, s34, I)
@@ -192,6 +192,6 @@ s12 = s23 = s34 = 1.
 phi_lim = compute_phi(s12, s23, s34, I)
 
 f = open(os.path.join('results',
-                      'Analytical_NunSri06_' + dipole['name'] + '.npz'), 'w')
+                      'Analytical_NunSri06_' + dipole['name'] + '.npz'), 'wb')
 np.savez(f, phi_20=phi_20, phi_40=phi_40, phi_80=phi_80, phi_lim=phi_lim)
 f.close()

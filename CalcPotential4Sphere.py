@@ -59,10 +59,10 @@ class CalcPotential4Sphere:
 
         """
         # print 'calc potential'
-        print 'p', p
+        print('p', p)
         p_rad, p_tan = self.decompose_dipole(p)
-        print 'p_rad', p_rad
-        print 'p_tan', p_tan
+        print('p_rad', p_rad)
+        print('p_tan', p_tan)
         pot_rad = self.calc_rad_potential(p_rad)
         pot_tan = self.calc_tan_potential(p_tan)
 
@@ -104,7 +104,7 @@ class CalcPotential4Sphere:
         """
 
         p_tot = np.linalg.norm(p_rad, axis=1)
-        print p_tot
+        print(p_tot)
         theta = self.calc_theta()
         s_vector = self.sign_rad_dipole(p_rad)
         phi_const = s_vector * p_tot / (4 * np.pi * self.sigma1 * self.rz ** 2) * self.k1
@@ -481,7 +481,7 @@ if __name__ == '__main__':
     charges = [-1 * ii / 200000 for ii in param_dict['charge']]
     radii = [ii / 10000.0 for ii in radii]
 
-    print sigmas, el_points, charge_pos, charges, radii
+    print(sigmas, el_points, charge_pos, charges, radii)
 
     phis = []
     rz1 = (charge_pos[0] + charge_pos[1]) / 2
@@ -564,6 +564,6 @@ if __name__ == '__main__':
     sphere_mod = CalcPotential4Sphere(radii, sigmas, el_points, rz1)
     phis.append(sphere_mod.calc_potential(P1).reshape(180, 180))
 
-    f = open('./results/CalcPotential4_correct_all.npz', 'w')
+    f = open('./results/CalcPotential4_correct_all.npz', 'wb')
     np.savez(f, phis[0],phis[1],phis[2],phis[3],phis[4],phis[5],phis[6],phis[7],phis[8], phis[9])
     f.close()
