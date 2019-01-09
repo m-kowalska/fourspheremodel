@@ -8,6 +8,17 @@ import os
 import parameters as params
 from matplotlib import colors
 
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--directory', '-d',
+                    default='results',
+                    dest='results',
+                    help='a path to the result directory')
+
+args = parser.parse_args()
+
 print('load data')
 # import EEG on sphere computed analytically and numerically
 # these are computed with current input = 1 microA
@@ -16,13 +27,13 @@ print('load data')
 # in order to get results in normal EEG magnitude: 10-100 micro V
 # we give current input = 100 micro A
 k = 100  # scaling factor --> give results in ~10 micro V
-ana_rad = np.load(os.path.join("results", "Analytical_rad.npz"))['phi_20']*k
-ana_tan = np.load(os.path.join("results", "Analytical_tan.npz"))['phi_20']*k
-ana_mix = np.load(os.path.join("results", "Analytical_mix.npz"))['phi_20']*k
+ana_rad = np.load(os.path.join(args.results, "Analytical_rad.npz"))['phi_20']*k
+ana_tan = np.load(os.path.join(args.results, "Analytical_tan.npz"))['phi_20']*k
+ana_mix = np.load(os.path.join(args.results, "Analytical_mix.npz"))['phi_20']*k
 
-num_rad = np.load(os.path.join("results", "Numerical_rad.npz"))['fem_20']*k
-num_tan = np.load(os.path.join("results", "Numerical_tan.npz"))['fem_20']*k
-num_mix = np.load(os.path.join("results", "Numerical_mix.npz"))['fem_20']*k
+num_rad = np.load(os.path.join(args.results, "Numerical_rad.npz"))['fem_20']*k
+num_tan = np.load(os.path.join(args.results, "Numerical_tan.npz"))['fem_20']*k
+num_mix = np.load(os.path.join(args.results, "Numerical_mix.npz"))['fem_20']*k
 
 fem_list = [num_rad, num_tan, num_mix]
 ana_list = [ana_rad, ana_tan, ana_mix]
@@ -207,7 +218,9 @@ print('axes ok')
 
 # plt.show()
 
-# plt.savefig('./results/eeg_fig_scaled.pdf', dpi=600., bbox_inches='tight')
+# plt.savefig(os.path.join(args.results,
+#                          'eeg_fig_scaled.pdf'),
+#             dpi=600., bbox_inches='tight')
 
 
 # colorbars
@@ -326,6 +339,12 @@ fig.set_size_inches(6.5, 6.)
 # plt.show()
 print('saving figure')
 # fig.tight_layout()
-# plt.savefig('./results/figure2_w_scaled_glob_avg_strength_error.png', dpi=300., bbox_inches='tight')
-plt.savefig('./results/figure2_w_scaled_glob_max.png', dpi=300., bbox_inches='tight')
-# plt.savefig('./results/figure2_w_RE.png', dpi=300., bbox_inches='tight')
+# plt.savefig(os.path.join(args.results,
+#                          'figure2_w_scaled_glob_avg_strength_error.png'),
+#             dpi=300., bbox_inches='tight')
+plt.savefig(os.path.join(args.results,
+                         'figure2_w_scaled_glob_max.png'),
+            dpi=300., bbox_inches='tight')
+# plt.savefig(os.path.join(args.results,
+#                          'figure2_w_RE.png'),
+#             dpi=300., bbox_inches='tight')

@@ -470,10 +470,22 @@ class CalcPotential4Sphere:
 
 if __name__ == '__main__':
     import parameters as params
-    fle = np.load('./results/eeg_rad200000.npz')
+    import argparse
+    import os.path
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--directory', '-d',
+                        default='results',
+                        dest='results',
+                        help='a path to the result directory')
+
+    args = parser.parse_args()
+
     # XXX: file results/eeg_rad200000.npz removed
     # by e5bef9051098e6790afbc434a9acc6d9a2b229e3
     # If fixed - undo 2450b755a8870220143d400149f98b66bf1fd1b8
+    fle = np.load(os.path.join(args.results,
+                               'eeg_rad200000.npz'))
     param_dict = fle['params'].item()
 
     radii = param_dict['radii']
@@ -567,6 +579,7 @@ if __name__ == '__main__':
     sphere_mod = CalcPotential4Sphere(radii, sigmas, el_points, rz1)
     phis.append(sphere_mod.calc_potential(P1).reshape(180, 180))
 
-    f = open('./results/CalcPotential4_correct_all.npz', 'wb')
-    np.savez(f, phis[0],phis[1],phis[2],phis[3],phis[4],phis[5],phis[6],phis[7],phis[8], phis[9])
-    f.close()
+    with open(os.path.join(args.results,
+                           'CalcPotential4_correct_all.npz'),
+              'wb') as f:
+      np.savez(f, phis[0],phis[1],phis[2],phis[3],phis[4],phis[5],phis[6],phis[7],phis[8], phis[9])

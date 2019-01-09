@@ -3,6 +3,8 @@ import numpy as np
 from scipy.special import lpmv
 import parameters as params
 
+import argparse
+
 
 def V(n):
     k = (n+1.) / n
@@ -156,6 +158,18 @@ def compute_phi(s12, s23, s34, I):
     return (rad_phi ) / (params.sigma_brain)
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--directory', '-d',
+                    default='results',
+                    dest='results',
+                    help='a path to the result directory')
+
+args = parser.parse_args()
+
+if not os.path.exists(args.results):
+    os.makedirs(args.results)
+
+
 # scalp_rad = scalp_rad - rad_tol
 rz = params.dipole_loc
 rz1 = rz / params.brain_rad
@@ -192,7 +206,7 @@ phi_80 = compute_phi(s12, s23, s34, I)
 s12 = s23 = s34 = 1.
 phi_lim = compute_phi(s12, s23, s34, I)
 
-f = open(os.path.join('results',
-                      'Analytical_Sri98_no_bn1_' + dipole['name'] + '.npz'), 'wb')
-np.savez(f, phi_20=phi_20, phi_40=phi_40, phi_80=phi_80, phi_lim=phi_lim)
-f.close()
+with open(os.path.join(args.results,
+                       'Analytical_Sri98_no_bn1_' + dipole['name'] + '.npz'),
+          'wb') as f:
+    np.savez(f, phi_20=phi_20, phi_40=phi_40, phi_80=phi_80, phi_lim=phi_lim)
