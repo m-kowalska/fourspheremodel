@@ -109,8 +109,8 @@ colors_4s_list = [clr(ana_list[idx]) for idx in range(3)]
 colors_fem_list = [clr(fem_list[idx]) for idx in range(3)]
 # colors_error_list = [clr_error(error_list[idx]) for idx in range(3)]
 colors_scaled_error_list = [clr_error(scaled_error_list[idx]) for idx in range(3)]
-print('max_RE', np.max(RE_list))
-colors_RE_list = [clr_RE(RE_list[idx]) for idx in range(3)]
+# print('max_RE', np.max(RE_list))
+# colors_RE_list = [clr_RE(RE_list[idx]) for idx in range(3)]
 print('colors_4s created, ready for plotting')
 
 #############################################################################
