@@ -471,6 +471,8 @@ class CalcPotential4Sphere:
 if __name__ == '__main__':
     import parameters as params
     fle = np.load('./results/eeg_rad200000.npz')
+    # XXX: file results/eeg_rad200000.npz removed
+    # by e5bef9051098e6790afbc434a9acc6d9a2b229e3
     param_dict = fle['params'].item()
 
     radii = param_dict['radii']
