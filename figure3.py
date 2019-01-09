@@ -12,6 +12,12 @@ parser.add_argument('--directory', '-d',
                     default='results',
                     dest='results',
                     help='a path to the result directory')
+parser.add_argument('--sri98-no-bn1',
+                    action='store_const',
+                    const='Sri98_no_bn1',
+                    default='Sri98',
+                    dest='sri98',
+                    help='a path to the result directory')
 
 args = parser.parse_args()
 
@@ -28,7 +34,8 @@ phi_40_fit = (27.4*np.exp(-0.10*theta) - 5.49 + (0.203*theta) - 0.00234*(theta**
 phi_80_fit = (13.4*np.exp(-0.10*theta) - 0.155 - (0.0135*theta))*phi_0
 
 nunsri06 = np.load(os.path.join(args.results, 'Analytical_NunSri06_rad.npz'))
-sri98 = np.load(os.path.join(args.results, 'Analytical_Sri98_rad.npz'))
+sri98 = np.load(os.path.join(args.results,
+                             'Analytical_{.sri98}_rad.npz'.format(args)))
 analytical = np.load(os.path.join(args.results, 'Analytical_rad.npz'))
 numerical = np.load(os.path.join(args.results, 'Numerical_rad.npz'))
 

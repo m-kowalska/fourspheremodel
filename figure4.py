@@ -17,6 +17,12 @@ parser.add_argument('--directory', '-d',
                     default='results',
                     dest='results',
                     help='a path to the result directory')
+parser.add_argument('--sri98-no-bn1',
+                    action='store_const',
+                    const='Sri98_no_bn1',
+                    default='Sri98',
+                    dest='sri98',
+                    help='a path to the result directory')
 
 args = parser.parse_args()
 
@@ -35,7 +41,8 @@ prod = frst_trm + scnd_trm
 phi_sphere = I*d*prod / (4*np.pi*params.sigma_brain*(params.scalp_rad**2))
 
 nunsri06 = np.load(os.path.join(args.results, 'Analytical_NunSri06_rad.npz'))
-sri98 = np.load(os.path.join(args.results, 'Analytical_Sri98_rad.npz'))
+sri98 = np.load(os.path.join(args.results,
+                             'Analytical_{.sri98}_rad.npz'.format(args)))
 analytical = np.load(os.path.join(args.results, 'Analytical_rad.npz'))
 
 phi_nunsri06 = nunsri06['phi_lim'].reshape(180, 180)[:, 0][0:90] * k
