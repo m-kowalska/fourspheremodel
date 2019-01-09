@@ -120,13 +120,6 @@ skull sigma = scalp sigma / 80; "fem_80"
 
 For the radial, tangential and the 45 deg. oriented dipole
 
-!!!!***!!!!
-Alternate implementation available for this.
-
-python CalcPotential4Sphere.py
-(Self contained)
-
-
 5) Make plots! 
 source deactivate # matplotlib not available within the conda environment.
 
