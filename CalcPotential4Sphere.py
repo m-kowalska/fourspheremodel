@@ -473,6 +473,7 @@ if __name__ == '__main__':
     fle = np.load('./results/eeg_rad200000.npz')
     # XXX: file results/eeg_rad200000.npz removed
     # by e5bef9051098e6790afbc434a9acc6d9a2b229e3
+    # If fixed - undo 2450b755a8870220143d400149f98b66bf1fd1b8
     param_dict = fle['params'].item()
 
     radii = param_dict['radii']
