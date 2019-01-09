@@ -61,7 +61,7 @@ Files and work flow
 to create .xml files from .msh)
 
 cd mesh
-sh mesh_it_wm.sh
+sh mesh_it.sh
 ***NOW YOU WAIT***
 
 2) Finite Element Method
