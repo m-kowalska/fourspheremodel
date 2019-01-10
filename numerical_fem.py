@@ -57,10 +57,24 @@ def main_4shell_fem(mesh, subdomains, boundaries, skull_cond, src_pos, snk_pos):
     return vals
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mesh', nargs='?',
+                        default=os.path.join('mesh', 'sphere_4.xml'),
+                        help='a path to the XML file with the mesh')
+    parser.add_argument('--directory', '-d',
+                        default='results',
+                        dest='results',
+                        help='a path to the result directory')
+
+    args = parser.parse_args()
+    if not os.path.exists(args.results):
+        os.makedirs(args.results)
+
     print('Loading meshes')
-    mesh = Mesh(os.path.join("mesh", "sphere_4.xml"))
-    subdomains = MeshFunction("size_t", mesh, os.path.join("mesh", "sphere_4_physical_region.xml"))
-    boundaries = MeshFunction("size_t", mesh, os.path.join("mesh", "sphere_4_facet_region.xml"))
+    mesh = Mesh(args.mesh)
+    subdomains = MeshFunction("size_t", mesh, args.mesh[:-4] + '_physical_region.xml')
+    boundaries = MeshFunction("size_t", mesh, args.mesh[:-4] + '_facet_region.xml')
     for dipole in params.dipole_list:
         print('Now computing FEM for dipole: ', dipole['name'])
         src_pos = dipole['src_pos']
@@ -75,7 +89,7 @@ if __name__ == '__main__':
         fem_80 = main_4shell_fem(mesh, subdomains, boundaries,
                                  params.sigma_skull80, src_pos, snk_pos)
         print('Done 4Shell-FEM-80')
-        f = open(os.path.join('results',
+        f = open(os.path.join(args.results,
                               'Numerical_' + dipole['name'] + '.npz'), 'wb')
         np.savez(f, fem_20=fem_20, fem_40=fem_40, fem_80=fem_80)
         f.close()
